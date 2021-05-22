@@ -3,6 +3,7 @@ name = "musicprogram"
 version = "0.1.0"
 authors = ["Filip Szczepański <jazz2rulez@gmail.com>"]
 edition = "2018"
+license = "ISC"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
