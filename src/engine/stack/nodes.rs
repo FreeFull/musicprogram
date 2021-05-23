@@ -1,63 +1,13 @@
-type Audio = [f32; 256];
-type Control = f32;
-
-pub struct Stack {
-    pub nodes: Vec<Node>,
-    pub data: StackData,
-}
-
-pub struct StackData {
-    pub audio: [Audio; 256],
-    pub control: [Control; 256],
-}
-
-impl Stack {
-    pub fn new() -> Stack {
-        Stack {
-            nodes: vec![
-                Node::Saw {
-                    frequency: Port::Control(Some(0), 0.0),
-                    phase: Port::Control(None, 0.0),
-                    output: Port::Audio(Some(0), [0.0; 256]),
-                },
-                Node::Mul {
-                    volume: Port::Control(None, 0.25),
-                    audio: Port::Audio(Some(0), [0.0; 256]),
-                },
-                Node::Adsr {
-                    attack: Port::Control(None, 0.1),
-                    decay: Port::Control(None, 1.0),
-                    sustain: Port::Control(None, 0.25),
-                    release: Port::Control(None, 1.0),
-                    output: Port::Audio(Some(1), [0.0; 256]),
-                    previous_gate: 0.0,
-                    gate: Port::Control(Some(1), 0.0),
-                    time: 0.0,
-                    voltage: 0.0,
-                },
-                Node::Mul {
-                    volume: Port::Audio(Some(1), [0.0; 256]),
-                    audio: Port::Audio(Some(0), [0.0; 256]),
-                },
-            ],
-            data: StackData {
-                audio: [[0.0; 256]; 256],
-                control: [0.0; 256],
-            },
-        }
-    }
-
-    pub fn process(&mut self, output_buffer: &mut [f32], sample_rate: usize) {
-        for chunk in output_buffer.chunks_mut(256) {
-            for node in &mut self.nodes {
-                node.process(chunk.len(), &mut self.data, sample_rate);
-            }
-            chunk.copy_from_slice(&self.data.audio[0][..chunk.len()]);
-        }
-    }
-}
+use super::*;
 
 pub enum Node {
+    Add {
+        input: Port,
+        output: Port,
+    },
+    Abs {
+        output: Port,
+    },
     Adsr {
         attack: Port,
         decay: Port,
@@ -66,7 +16,7 @@ pub enum Node {
         output: Port,
         previous_gate: f32,
         gate: Port,
-        time: f32,
+        time: Port,
         voltage: f32,
     },
     Mul {
@@ -78,12 +28,33 @@ pub enum Node {
         phase: Port,
         output: Port,
     },
+    Pwm {
+        frequency: Port,
+        phase: Port,
+        pulse_width: Port,
+        output: Port,
+    },
 }
 
 impl Node {
-    fn process(&mut self, samples: usize, data: &mut StackData, sample_rate: usize) {
+    pub fn process(&mut self, samples: usize, data: &mut StackData, sample_rate: usize) {
         assert!(samples <= 256);
         match self {
+            Node::Add { input, output } => {
+                input.get(data);
+                output.get(data);
+                for i in 0..samples {
+                    output[i] += input[i];
+                }
+                output.set(data);
+            }
+            Node::Abs { output } => {
+                output.get(data);
+                for i in 0..samples {
+                    output[i] = output[i].abs();
+                }
+                output.set(data);
+            }
             Node::Adsr {
                 attack,
                 decay,
@@ -101,6 +72,7 @@ impl Node {
                 release.get(data);
                 output.get(data);
                 gate.get(data);
+                time.get(data);
                 for i in 0..samples {
                     let attack = attack[i];
                     let decay = decay[i];
@@ -108,21 +80,22 @@ impl Node {
                     let release = release[i];
                     if gate[i] != 0.0 {
                         if *previous_gate == 0.0 {
-                            *time = 0.0;
+                            time[i] = 0.0;
                         }
-                        if *time < attack {
-                            *voltage = *time / attack;
-                        } else if *time < attack + decay {
-                            *voltage = (decay + attack - *time) * (1.0 - sustain) / decay + sustain;
+                        if time[i] < attack {
+                            *voltage = time[i] / attack;
+                        } else if time[i] < attack + decay {
+                            *voltage = (decay + attack - time[i]) * (1.0 - sustain) / decay + sustain;
                         }
                     } else {
-                        *voltage -= sustain/(release * sample_rate as f32);
+                        *voltage -= sustain / (release * sample_rate as f32);
                         *voltage = (*voltage).max(0.0);
                     }
                     output[i] = *voltage;
                     *previous_gate = gate[i];
-                    *time += 1.0 / sample_rate as f32;
+                    time[i] += 1.0 / sample_rate as f32;
                 }
+                time.set(data);
                 output.set(data);
             }
             Node::Mul { volume, audio } => {
@@ -150,6 +123,24 @@ impl Node {
                 phase.set(data);
                 output.set(data);
             }
+            Node::Pwm {
+                frequency,
+                phase,
+                pulse_width,
+                output,
+            } => {
+                frequency.get(data);
+                phase.get(data);
+                pulse_width.get(data);
+                for i in 0..samples {
+                    phase[i] %= 1.0;
+                    output[i] = if phase[i] > pulse_width[i] { 1.0 } else { -1.0 };
+                    phase[i] += frequency[i] / sample_rate as f32;
+                    phase[i] %= 1.0;
+                }
+                phase.set(data);
+                output.set(data);
+            }
         }
     }
 }
@@ -161,7 +152,7 @@ pub enum Port {
 }
 
 impl Port {
-    fn get(&mut self, data: &StackData) {
+    pub fn get(&mut self, data: &StackData) {
         match *self {
             Port::Audio(Some(index), _) => {
                 *self = Port::Audio(Some(index), data.audio[index as usize])
@@ -173,7 +164,7 @@ impl Port {
         };
     }
 
-    fn set(&self, data: &mut StackData) {
+    pub fn set(&self, data: &mut StackData) {
         match *self {
             Port::Audio(Some(index), audio) => {
                 data.audio[index as usize].copy_from_slice(&audio);
