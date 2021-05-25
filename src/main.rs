@@ -1,8 +1,6 @@
 mod engine;
+mod ui;
 
 fn main() {
-    let _engine = engine::start().unwrap();
-    loop {
-        std::thread::sleep(std::time::Duration::from_secs(10));
-    }
+    ui::start();
 }

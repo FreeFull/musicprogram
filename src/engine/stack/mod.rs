@@ -5,7 +5,7 @@ type Audio = [f32; 256];
 type Control = f32;
 
 pub struct Stack {
-    pub nodes: Vec<Node>,
+    pub nodes: Vec<NodeEnum>,
     pub data: StackData,
 }
 
@@ -18,25 +18,25 @@ impl Stack {
     pub fn new() -> Stack {
         Stack {
             nodes: vec![
-                Node::Saw {
+                NodeEnum::Saw {
                     frequency: Port::Control(None, 0.1),
                     phase: Port::Control(None, 0.0),
                     output: Port::Audio(Some(0), [0.0; 256]),
                 },
-                Node::Abs {
+                NodeEnum::Abs {
                     output: Port::Audio(Some(0), [0.0; 256]),
                 },
-                Node::Pwm {
+                NodeEnum::Pwm {
                     frequency: Port::Control(Some(0), 0.0),
                     phase: Port::Control(None, 0.0),
                     pulse_width: Port::Audio(Some(0), [0.0; 256]),
                     output: Port::Audio(Some(0), [0.0; 256]),
                 },
-                Node::Mul {
+                NodeEnum::Mul {
                     volume: Port::Control(None, 0.25),
                     audio: Port::Audio(Some(0), [0.0; 256]),
                 },
-                Node::Adsr {
+                NodeEnum::Adsr {
                     attack: Port::Control(None, 0.1),
                     decay: Port::Control(None, 1.0),
                     sustain: Port::Control(None, 0.25),
@@ -47,7 +47,7 @@ impl Stack {
                     time: Port::Control(Some(2), 0.0),
                     voltage: 0.0,
                 },
-                Node::Mul {
+                NodeEnum::Mul {
                     volume: Port::Audio(Some(1), [0.0; 256]),
                     audio: Port::Audio(Some(0), [0.0; 256]),
                 },

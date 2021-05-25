@@ -1,6 +1,16 @@
 use super::*;
 
-pub enum Node {
+pub trait Node {
+    fn process(&mut self, samples: usize, data: &mut StackData, sample_rate: usize);
+}
+
+impl Node for NodeEnum {
+    fn process(&mut self, samples: usize, data: &mut StackData, sample_rate: usize) {
+        self.process(samples, data, sample_rate);
+    }
+}
+
+pub enum NodeEnum {
     Add {
         input: Port,
         output: Port,
@@ -36,11 +46,11 @@ pub enum Node {
     },
 }
 
-impl Node {
+impl NodeEnum {
     pub fn process(&mut self, samples: usize, data: &mut StackData, sample_rate: usize) {
         assert!(samples <= 256);
         match self {
-            Node::Add { input, output } => {
+            NodeEnum::Add { input, output } => {
                 input.get(data);
                 output.get(data);
                 for i in 0..samples {
@@ -48,14 +58,14 @@ impl Node {
                 }
                 output.set(data);
             }
-            Node::Abs { output } => {
+            NodeEnum::Abs { output } => {
                 output.get(data);
                 for i in 0..samples {
                     output[i] = output[i].abs();
                 }
                 output.set(data);
             }
-            Node::Adsr {
+            NodeEnum::Adsr {
                 attack,
                 decay,
                 sustain,
@@ -98,7 +108,7 @@ impl Node {
                 time.set(data);
                 output.set(data);
             }
-            Node::Mul { volume, audio } => {
+            NodeEnum::Mul { volume, audio } => {
                 volume.get(data);
                 audio.get(data);
                 for i in 0..samples {
@@ -106,7 +116,7 @@ impl Node {
                 }
                 audio.set(data);
             }
-            Node::Saw {
+            NodeEnum::Saw {
                 frequency,
                 phase,
                 output,
@@ -123,7 +133,7 @@ impl Node {
                 phase.set(data);
                 output.set(data);
             }
-            Node::Pwm {
+            NodeEnum::Pwm {
                 frequency,
                 phase,
                 pulse_width,
