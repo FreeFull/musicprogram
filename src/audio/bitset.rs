@@ -11,6 +11,9 @@ impl BitSet {
     pub fn clear(&mut self, index: u8) {
         self.0[index as usize >> 3] &= !(1 << (index & 0x7));
     }
+    pub fn clear_all(&mut self) {
+        self.0 = [0; 32];
+    }
     pub fn contains(&self, index: u8) -> bool {
         (self.0[index as usize >> 3] & (1 << (index & 0x7))) != 0
     }
