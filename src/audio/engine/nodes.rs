@@ -264,6 +264,10 @@ impl Node {
         }
         outputs.into_iter()
     }
+
+    pub fn name(&self) -> &'static str {
+        NodeKind::from(self).name()
+    }
 }
 
 impl NodeKind {

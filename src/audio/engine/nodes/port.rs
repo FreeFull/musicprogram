@@ -88,7 +88,6 @@ impl Port {
                 PortKind::Control(buf) => {
                     *buf = data.control[index as usize];
                 }
-                _ => {}
             }
         }
     }
@@ -102,7 +101,6 @@ impl Port {
                 PortKind::Control(control) => {
                     data.control[index as usize] = control;
                 }
-                _ => {}
             }
         }
     }

@@ -13,16 +13,30 @@ pub struct Engine {
     pitch: f64,
     notes: BitSet,
     notes_on: u8,
+    dropper: rtrb::Producer<Vec<Node>>,
 }
 
 impl Engine {
     pub fn new() -> Engine {
+        let (dropper_producer, mut dropper_consumer) = rtrb::RingBuffer::new(128).split();
+        std::thread::spawn(move || {
+            const SECOND: std::time::Duration = std::time::Duration::from_secs(1);
+            loop {
+                match dropper_consumer.pop() {
+                    Ok(_) => {}
+                    Err(rtrb::PopError::Empty) => {
+                        std::thread::sleep(SECOND);
+                    }
+                }
+            }
+        });
         Engine {
             midi_in: None,
             stack: stack::Stack::new(),
             pitch: 110.0,
             notes: BitSet::new(),
             notes_on: 0,
+            dropper: dropper_producer,
         }
     }
 
@@ -58,4 +72,18 @@ impl Engine {
         self.midi_in = midi_closure;
         */
     }
+
+    pub fn run_command(&mut self, command: Command) {
+        match command {
+            Command::ReplaceNodes(mut nodes) => {
+                std::mem::swap(&mut self.stack.nodes, &mut nodes);
+                self.dropper.push(nodes).unwrap();
+            }
+        }
+    }
+}
+
+#[derive(Clone, Debug)]
+pub enum Command {
+    ReplaceNodes(Vec<Node>),
 }

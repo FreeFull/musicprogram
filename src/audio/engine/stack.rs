@@ -3,13 +3,13 @@ use super::*;
 type Audio = [f32; 256];
 type Control = f32;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Stack {
     pub nodes: Vec<Node>,
     pub data: StackData,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct StackData {
     pub audio: [Audio; 256],
     pub control: [Control; 256],
