@@ -1,6 +1,5 @@
 use super::audio;
 use cursive::{
-    direction::Orientation::{Horizontal, Vertical},
     menu::MenuTree,
     traits::{Boxable, Nameable},
     views,
@@ -8,6 +7,7 @@ use cursive::{
     View,
 };
 
+mod spinner;
 mod stack;
 
 struct UiData {
@@ -54,9 +54,9 @@ pub fn start() {
 }
 
 pub fn build() -> impl View {
-    let mut layout = views::LinearLayout::new(Vertical);
+    let mut layout = views::LinearLayout::vertical();
     layout.add_child(stack::build());
-    let status_bar = views::LinearLayout::new(Horizontal)
+    let status_bar = views::LinearLayout::horizontal()
         .child(views::TextView::new("").center().with_name("note"))
         .full_width();
     layout.add_child(status_bar);

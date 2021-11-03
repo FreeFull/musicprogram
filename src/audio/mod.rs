@@ -66,8 +66,8 @@ pub fn start() -> Result<Controller, Error> {
     let midi_in = client.register_port("capture_1", jack::MidiIn)?;
     let audio_out = client.register_port("playback_1", jack::AudioOut)?;
     let notification_handler = NotificationHandler {};
-    let data = rtrb::RingBuffer::new(128).split();
-    let input = rtrb::RingBuffer::new(1).split();
+    let data = rtrb::RingBuffer::new(128);
+    let input = rtrb::RingBuffer::new(1);
     let process_handler = ProcessHandler {
         midi_in,
         audio_out,

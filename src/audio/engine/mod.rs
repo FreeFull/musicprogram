@@ -18,7 +18,7 @@ pub struct Engine {
 
 impl Engine {
     pub fn new() -> Engine {
-        let (dropper_producer, mut dropper_consumer) = rtrb::RingBuffer::new(128).split();
+        let (dropper_producer, mut dropper_consumer) = rtrb::RingBuffer::new(128);
         std::thread::spawn(move || {
             const SECOND: std::time::Duration = std::time::Duration::from_secs(1);
             loop {
