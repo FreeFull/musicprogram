@@ -1,0 +1,11 @@
+.status-bar {
+    height: 50px;
+    child-space: 1s;
+    background-color: red;
+}
+
+.current-note {
+    child-space: 1s;
+    color: #ccccff;
+    background-color: #111155;
+}

@@ -1511,7 +1511,7 @@ checksum = "7ae2f58a822f08abdaf668897e96a5656fe72f5a9ce66422423e8849384872e6"
 [[package]]
 name = "tuix"
 version = "0.2.0"
-source = "git+https://github.com/geom3trik/tuix#a195db36e82785182a28e9f198d18835b75efa8a"
+source = "git+https://github.com/geom3trik/tuix#467d9fc39f4d30b46be54fec21f42dbc4e57a2ee"
 dependencies = [
  "tuix_internal",
 ]
@@ -1519,7 +1519,7 @@ dependencies = [
 [[package]]
 name = "tuix_core"
 version = "0.2.0"
-source = "git+https://github.com/geom3trik/tuix#a195db36e82785182a28e9f198d18835b75efa8a"
+source = "git+https://github.com/geom3trik/tuix#467d9fc39f4d30b46be54fec21f42dbc4e57a2ee"
 dependencies = [
  "bitflags",
  "cssparser",
@@ -1533,7 +1533,7 @@ dependencies = [
 [[package]]
 name = "tuix_derive"
 version = "0.2.0"
-source = "git+https://github.com/geom3trik/tuix#a195db36e82785182a28e9f198d18835b75efa8a"
+source = "git+https://github.com/geom3trik/tuix#467d9fc39f4d30b46be54fec21f42dbc4e57a2ee"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1543,7 +1543,7 @@ dependencies = [
 [[package]]
 name = "tuix_glutin"
 version = "0.2.0"
-source = "git+https://github.com/geom3trik/tuix#a195db36e82785182a28e9f198d18835b75efa8a"
+source = "git+https://github.com/geom3trik/tuix#467d9fc39f4d30b46be54fec21f42dbc4e57a2ee"
 dependencies = [
  "femtovg",
  "fnv",
@@ -1555,7 +1555,7 @@ dependencies = [
 [[package]]
 name = "tuix_internal"
 version = "0.2.0"
-source = "git+https://github.com/geom3trik/tuix#a195db36e82785182a28e9f198d18835b75efa8a"
+source = "git+https://github.com/geom3trik/tuix#467d9fc39f4d30b46be54fec21f42dbc4e57a2ee"
 dependencies = [
  "tuix_core",
  "tuix_derive",
@@ -1566,7 +1566,7 @@ dependencies = [
 [[package]]
 name = "tuix_widgets"
 version = "0.2.0"
-source = "git+https://github.com/geom3trik/tuix#a195db36e82785182a28e9f198d18835b75efa8a"
+source = "git+https://github.com/geom3trik/tuix#467d9fc39f4d30b46be54fec21f42dbc4e57a2ee"
 dependencies = [
  "femtovg",
  "keyboard-types",

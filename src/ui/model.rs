@@ -3,17 +3,26 @@ use tuix::*;
 
 use crate::audio;
 
-#[derive(Debug)]
+#[derive(Debug, Lens)]
 pub struct AppData {
     pub note: wmidi::Note,
     pub control: Producer<audio::engine::Command>,
+    pub nodes: NodeData,
+}
+
+impl AppData {
+    pub fn new(control: Producer<audio::engine::Command>) -> Self {
+        AppData {
+            note: wmidi::Note::LOWEST_NOTE,
+            control,
+            nodes: NodeData { nodes: Vec::new() },
+        }
+    }
 }
 
 impl Model for AppData {
     fn on_event(&mut self, state: &mut State, entity: Entity, event: &mut Event) {
         if let Some(app_event) = event.message.downcast::<AppEvent>() {
-            dbg!("AppEvent received");
-
             use AppEvent::*;
             match *app_event {
                 NoteIn(note) => {
@@ -23,15 +32,13 @@ impl Model for AppData {
             }
         }
     }
-
-    fn build(self, state: &mut State, parent: Entity) -> Entity
-    where
-        Self: std::marker::Sized + Model + Node,
-    {
-        Store::new(self).build(state, parent, |builder| builder)
-    }
 }
 
 pub enum AppEvent {
     NoteIn(wmidi::Note),
+}
+
+#[derive(Debug)]
+pub struct NodeData {
+    pub nodes: Vec<audio::engine::Node>,
 }
