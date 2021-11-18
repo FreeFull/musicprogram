@@ -8,9 +8,9 @@ license = "ISC"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-arrayvec = "0.7.1"
+arrayvec = "0.7.2"
 enum-kinds = "0.5.1"
-jack = "0.8.0"
+jack = "0.8.2"
 rtrb = "0.2.0"
 wmidi = "4.0.6"
-tuix = { git = "https://github.com/geom3trik/tuix" }
+vizia = { git = "https://github.com/geom3trik/VIZIA" }

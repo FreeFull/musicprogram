@@ -1,24 +1,32 @@
-use tuix::*;
+use vizia::{views::*, *};
 
 use super::model::*;
+use crate::audio::engine::Node;
 
-#[derive(Default)]
-pub struct NodeList {
-    list: Entity,
+pub fn build(cx: &mut Context) {
+    HStack::new(cx, |cx| {
+        List::new(cx, AppData::nodes, node).class("list");
+        VStack::new(cx, |cx| {
+            Button::new(
+                cx,
+                |cx| {},
+                |cx| {
+                    Label::new(cx, "Add");
+                },
+            );
+            Button::new(
+                cx,
+                |cx| {},
+                |cx| {
+                    Label::new(cx, "Remove");
+                },
+            );
+        });
+    })
+    .width(Stretch(1.0))
+    .height(Stretch(1.0));
 }
 
-impl Widget for NodeList {
-    type Ret = Entity;
-
-    type Data = NodeData;
-
-    fn on_build(&mut self, state: &mut State, entity: Entity) -> Self::Ret {
-        self.list =
-            widgets::ScrollContainer::new().build(state, entity, |builder| builder.class("list"));
-        entity
-    }
-
-    fn on_update(&mut self, state: &mut State, entity: Entity, data: &Self::Data) {
-        todo!()
-    }
+fn node(cx: &mut Context, ptr: ItemPtr<impl Lens<Target = Vec<Node>>, Node>) {
+    Label::new(cx, ptr.value(cx).name());
 }
