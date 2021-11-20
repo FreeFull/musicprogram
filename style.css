@@ -9,3 +9,9 @@
     color: #ccccff;
     background-color: #111155;
 }
+
+.modal {
+    background-color: green;
+    width: 1s;
+    height: 1s;
+}

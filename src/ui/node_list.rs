@@ -1,15 +1,18 @@
-use vizia::{views::*, *};
+use vizia::*;
 
-use super::model::*;
+use super::{modals::ModalEvent, model::*};
 use crate::audio::engine::Node;
 
 pub fn build(cx: &mut Context) {
     HStack::new(cx, |cx| {
-        List::new(cx, AppData::nodes, node).class("list");
+        List::new(cx, MainModel::nodes, node).class("list");
         VStack::new(cx, |cx| {
             Button::new(
                 cx,
-                |cx| {},
+                |cx| {
+                    println!("Add Node pressed");
+                    cx.emit(ModalEvent::Show("add node"));
+                },
                 |cx| {
                     Label::new(cx, "Add");
                 },

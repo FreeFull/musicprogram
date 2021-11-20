@@ -13,4 +13,4 @@ enum-kinds = "0.5.1"
 jack = "0.8.2"
 rtrb = "0.2.0"
 wmidi = "4.0.6"
-vizia = { git = "https://github.com/geom3trik/VIZIA" }
+vizia = { git = "https://github.com/geom3trik/VIZIA", branch = "new_data_system" }
