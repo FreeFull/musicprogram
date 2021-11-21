@@ -47,7 +47,7 @@ impl std::ops::IndexMut<usize> for Ports {
     }
 }
 
-#[derive(Copy, Clone, Debug, Default)]
+#[derive(Copy, Clone, Debug, Default, PartialEq)]
 pub struct Port {
     pub name: &'static str,
     pub stack_index: Option<u8>,
@@ -120,7 +120,7 @@ impl std::ops::IndexMut<usize> for Port {
     }
 }
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub enum PortKind {
     Audio([f32; 256]),
     Control(f32),

@@ -8,20 +8,20 @@ use crate::audio::{self, Controller};
 #[derive(Debug, Lens)]
 pub struct MainModel {
     pub note: Note,
-    pub control: Producer<audio::engine::Command>,
-    pub nodes: Vec<audio::engine::Node>,
+    //pub control: Producer<audio::engine::Command>,
+    pub nodes: Vec<audio::Node>,
 }
 
 impl MainModel {
     pub fn new() -> Self {
-        let Controller {
+        /*let Controller {
             active_client: _active_client,
             midi_ui,
             input: audio_input,
-        } = audio::start().unwrap();
+        } = audio::start().unwrap();*/
         MainModel {
             note: Note(wmidi::Note::LOWEST_NOTE),
-            control: audio_input,
+            //control: audio_input,
             nodes: Vec::new(),
         }
     }
@@ -32,6 +32,9 @@ impl Model for MainModel {
         if let Some(app_event) = event.message.downcast::<AppEvent>() {
             use AppEvent::*;
             match *app_event {
+                AddNode(kind) => {
+                    self.nodes.push(audio::Node::new(kind));
+                }
                 NoteIn(note) => {
                     self.note.0 = note;
                 }
@@ -42,6 +45,7 @@ impl Model for MainModel {
 
 #[derive(Clone, Copy, Debug)]
 pub enum AppEvent {
+    AddNode(audio::NodeKind),
     NoteIn(wmidi::Note),
 }
 

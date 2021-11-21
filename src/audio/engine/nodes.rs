@@ -6,7 +6,7 @@ use super::*;
 mod port;
 pub use port::*;
 
-#[derive(Clone, Debug, EnumKind)]
+#[derive(Clone, Debug, EnumKind, PartialEq)]
 #[enum_kind(NodeKind)]
 pub enum Node {
     Abs {

@@ -4,7 +4,8 @@ use self::engine::Command;
 pub use self::error::Error;
 
 mod bitset;
-pub mod engine;
+mod engine;
+pub use engine::*;
 mod error;
 
 #[derive(Debug)]

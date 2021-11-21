@@ -1,10 +1,15 @@
 use vizia::*;
 
 use super::{modals::ModalEvent, model::*};
-use crate::audio::engine::Node;
+use crate::audio::Node;
 
 pub fn build(cx: &mut Context) {
     HStack::new(cx, |cx| {
+        ListData {
+            selected: 0,
+            length: 0,
+        }
+        .build(cx);
         List::new(cx, MainModel::nodes, node).class("list");
         VStack::new(cx, |cx| {
             Button::new(

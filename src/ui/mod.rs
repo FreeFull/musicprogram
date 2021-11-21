@@ -17,7 +17,7 @@ pub fn start() {
     Application::new(move |cx| {
         cx.add_stylesheet("style.css").ok();
         model::MainModel::new().build(cx);
-        VStack::new(cx, |cx| {
+        ZStack::new(cx, |cx| {
             VStack::new(cx, |cx| {
                 node_list::build(cx);
                 HStack::new(cx, |cx| {
@@ -26,16 +26,15 @@ pub fn start() {
                     });
                 })
                 .class("status-bar");
-            })
-            .position_type(PositionType::SelfDirected);
+            });
             modals::build(cx);
         });
     })
     .run();
 }
 
-impl Data for crate::audio::engine::Node {
+impl Data for crate::audio::Node {
     fn same(&self, other: &Self) -> bool {
-        todo!()
+        self == other
     }
 }
