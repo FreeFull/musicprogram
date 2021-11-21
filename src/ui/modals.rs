@@ -50,16 +50,12 @@ fn modal(
             content(cx);
             HStack::new(cx, buttons).class("buttons");
         })
-        .class("modal");
-        // Bindings are currently views, so the binding itself needs to be hidden
-        cx.style.borrow_mut().display.insert(
-            parent,
-            if field.get(cx) == &Some(id) {
-                Display::Flex
-            } else {
-                Display::None
-            },
-        );
+        .class("modal")
+        .display(if field.get(cx) == &Some(id) {
+            Display::Flex
+        } else {
+            Display::None
+        });
     });
 }
 
