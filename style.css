@@ -15,3 +15,22 @@
     width: 1s;
     height: 1s;
 }
+
+.node {
+    background-color: #ccccff;
+}
+
+.node .input {
+    background-color: #a6a6d1;
+}
+
+.node .output {
+    background-color: #8484a8;
+}
+
+.node .delete {
+    background-color: #c52a2a;
+    color: black;
+    width: 30px;
+    child-space: 1s;
+}

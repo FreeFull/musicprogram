@@ -1,7 +1,7 @@
 use crate::audio;
 use vizia::*;
 
-use super::AppEvent;
+use crate::ui::AppEvent;
 
 pub fn build(cx: &mut Context) {
     ModalManager::default().build(cx);

@@ -35,6 +35,9 @@ impl Model for MainModel {
                 AddNode(kind) => {
                     self.nodes.push(audio::Node::new(kind));
                 }
+                RemoveNode(index) => {
+                    self.nodes.remove(index);
+                }
                 NoteIn(note) => {
                     self.note.0 = note;
                 }
@@ -46,6 +49,7 @@ impl Model for MainModel {
 #[derive(Clone, Copy, Debug)]
 pub enum AppEvent {
     AddNode(audio::NodeKind),
+    RemoveNode(usize),
     NoteIn(wmidi::Note),
 }
 

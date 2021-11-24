@@ -2,13 +2,10 @@ use std::{cell::RefCell, rc::Rc};
 
 use crate::audio::Controller;
 
-use super::audio;
-
 use vizia::*;
 
-mod modals;
 mod model;
-mod node_list;
+mod views;
 
 pub use model::*;
 
@@ -19,7 +16,7 @@ pub fn start() {
         model::MainModel::new().build(cx);
         ZStack::new(cx, |cx| {
             VStack::new(cx, |cx| {
-                node_list::build(cx);
+                views::node_list::build(cx);
                 HStack::new(cx, |cx| {
                     Binding::new(cx, model::MainModel::note, |cx, note| {
                         Label::new(cx, note.get(cx).to_str()).class("current-note");
@@ -27,7 +24,7 @@ pub fn start() {
                 })
                 .class("status-bar");
             });
-            modals::build(cx);
+            views::modals::build(cx);
         });
     })
     .run();
