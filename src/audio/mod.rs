@@ -1,6 +1,5 @@
 use std::convert::TryFrom;
 
-use self::engine::Command;
 pub use self::error::Error;
 
 mod bitset;

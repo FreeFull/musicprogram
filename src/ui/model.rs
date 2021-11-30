@@ -1,27 +1,28 @@
-use std::ops::{Deref, DerefMut};
+use std::{
+    cell::RefCell,
+    ops::{Deref, DerefMut},
+    rc::Rc,
+};
 
-use rtrb::Producer;
 use vizia::*;
+use wmidi::MidiMessage;
 
-use crate::audio::{self, Controller};
+use crate::audio;
+
+type AudioTx = Rc<RefCell<rtrb::Producer<audio::Command>>>;
 
 #[derive(Debug, Lens)]
 pub struct MainModel {
     pub note: Note,
-    //pub control: Producer<audio::engine::Command>,
+    pub audio_event_tx: AudioTx,
     pub nodes: Vec<audio::Node>,
 }
 
 impl MainModel {
-    pub fn new() -> Self {
-        /*let Controller {
-            active_client: _active_client,
-            midi_ui,
-            input: audio_input,
-        } = audio::start().unwrap();*/
+    pub fn new(audio_event_tx: AudioTx) -> Self {
         MainModel {
             note: Note(wmidi::Note::LOWEST_NOTE),
-            //control: audio_input,
+            audio_event_tx,
             nodes: Vec::new(),
         }
     }
@@ -29,6 +30,7 @@ impl MainModel {
 
 impl Model for MainModel {
     fn event(&mut self, cx: &mut Context, event: &mut Event) {
+        let _ = cx;
         if let Some(app_event) = event.message.downcast::<AppEvent>() {
             use AppEvent::*;
             match *app_event {
@@ -38,19 +40,22 @@ impl Model for MainModel {
                 RemoveNode(index) => {
                     self.nodes.remove(index);
                 }
-                NoteIn(note) => {
-                    self.note.0 = note;
-                }
+                MidiIn(ref midi_message) => match *midi_message {
+                    MidiMessage::NoteOn(_channel, note, _velocity) => {
+                        self.note.0 = note;
+                    }
+                    _ => {}
+                },
             }
         }
     }
 }
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Debug)]
 pub enum AppEvent {
     AddNode(audio::NodeKind),
     RemoveNode(usize),
-    NoteIn(wmidi::Note),
+    MidiIn(wmidi::MidiMessage<'static>),
 }
 
 #[derive(Clone, Copy, Debug)]

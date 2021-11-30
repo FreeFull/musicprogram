@@ -1,19 +1,20 @@
 use std::{cell::RefCell, rc::Rc};
 
-use crate::audio::Controller;
-
 use vizia::*;
 
 mod model;
 mod views;
 
+use crate::audio;
 pub use model::*;
 
 pub fn start() {
-    let data = Rc::new(RefCell::new(()));
-    Application::new(move |cx| {
+    let window_desc = WindowDescription::new().with_title("musicprogram");
+    let mut controller = audio::start().unwrap();
+    let audio_tx = Rc::new(RefCell::new(controller.input));
+    let app = Application::new(window_desc, move |cx| {
         cx.add_stylesheet("style.css").ok();
-        model::MainModel::new().build(cx);
+        model::MainModel::new(audio_tx.clone()).build(cx);
         ZStack::new(cx, |cx| {
             VStack::new(cx, |cx| {
                 views::node_list::build(cx);
@@ -26,8 +27,17 @@ pub fn start() {
             });
             views::modals::build(cx);
         });
-    })
-    .run();
+    });
+    let proxy = app.get_proxy();
+    std::thread::spawn(move || loop {
+        while let Ok(midi_message) = controller.midi_ui.pop() {
+            if let Err(_) = proxy.send_event(Event::new(AppEvent::MidiIn(midi_message))) {
+                return;
+            }
+        }
+        std::thread::sleep(std::time::Duration::from_millis(10));
+    });
+    app.run();
 }
 
 impl Data for crate::audio::Node {

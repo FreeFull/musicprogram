@@ -1,9 +1,6 @@
 use vizia::*;
 
-use crate::{
-    audio,
-    ui::{AppEvent, MainModel},
-};
+use crate::ui::{AppEvent, MainModel};
 
 pub struct Node {
     index: usize,

@@ -8,7 +8,8 @@ pub fn build(cx: &mut Context) {
             HStack::new(cx, move |cx| {
                 Label::new(cx, node.value(cx).name());
                 views::Node::new(cx, node.index());
-            });
+            })
+            .height(Auto);
         })
         .class("list");
         VStack::new(cx, |cx| {

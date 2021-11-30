@@ -45,7 +45,6 @@ fn modal(
     buttons: impl Fn(&mut Context) + Copy + 'static,
 ) {
     Binding::new(cx, ModalManager::visible, move |cx, field| {
-        let parent = cx.current;
         VStack::new(cx, move |cx| {
             content(cx);
             HStack::new(cx, buttons).class("buttons");
