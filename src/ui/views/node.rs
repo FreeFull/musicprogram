@@ -29,10 +29,12 @@ impl View for Node {
                         cx.emit(AppEvent::RemoveNode(index));
                     },
                     |cx| {
-                        //Label::new(cx, "X");
+                        Label::new(cx, "X")
+                            .child_space(Stretch(1.0))
+                            .width(Stretch(1.0))
+                            .height(Stretch(1.0));
                     },
                 )
-                .text("X")
                 .class("delete");
             })
             .class("node");
