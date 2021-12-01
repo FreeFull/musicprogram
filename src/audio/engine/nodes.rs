@@ -34,7 +34,6 @@ pub enum Node {
         input_2: Port,
         output: Port,
     },
-    Chain(Vec<Node>),
     Oscillator {
         frequency: Port,
         phase: Port,
@@ -67,7 +66,6 @@ impl Node {
                 previous_gate: 0.0,
                 voltage: 0.0,
             },
-            NodeKind::Chain => Node::Chain(Vec::new()),
             NodeKind::Mul => Node::Mul {
                 input_1: Port::default(),
                 input_2: Port::default(),
@@ -173,11 +171,6 @@ impl Node {
                     phase[i] += frequency[i] / sample_rate as f32;
                 }
             }
-            Chain(nodes) => {
-                for node in &mut **nodes {
-                    node.process(samples, data, sample_rate);
-                }
-            }
         }
         for output in self.outputs() {
             output.write(data);
@@ -225,7 +218,6 @@ impl Node {
                 inputs.push(input_1);
                 inputs.push(input_2);
             }
-            Node::Chain(_) => {}
             Node::Oscillator {
                 frequency,
                 phase,
@@ -257,7 +249,6 @@ impl Node {
             Node::Mul { output, .. } => {
                 outputs.push(output);
             }
-            Node::Chain(_) => {}
             Node::Oscillator { output, .. } => {
                 outputs.push(output);
             }
@@ -276,7 +267,6 @@ impl NodeKind {
             NodeKind::Abs,
             NodeKind::Add,
             NodeKind::Adsr,
-            NodeKind::Chain,
             NodeKind::Mul,
             NodeKind::Oscillator,
         ])
@@ -288,7 +278,6 @@ impl NodeKind {
             NodeKind::Add => "Add",
             NodeKind::Adsr => "ADSR",
             NodeKind::Mul => "Mul",
-            NodeKind::Chain => "Chain",
             NodeKind::Oscillator => "Oscillator",
         }
     }
