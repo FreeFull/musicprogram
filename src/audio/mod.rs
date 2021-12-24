@@ -7,7 +7,6 @@ mod engine;
 pub use engine::*;
 mod error;
 
-#[derive(Debug)]
 pub struct Controller {
     pub active_client: jack::AsyncClient<NotificationHandler, ProcessHandler>,
     pub midi_ui: rtrb::Consumer<wmidi::MidiMessage<'static>>,
@@ -52,7 +51,7 @@ impl jack::ProcessHandler for ProcessHandler {
             return jack::Control::Quit;
         }
         let buffer = self.audio_out.as_mut_slice(process_scope);
-        self.engine.stack.process(buffer, client.sample_rate());
+        //self.engine.stack.process(buffer, client.sample_rate());
         for sample in buffer {
             *sample = sample.clamp(-1.0, 1.0);
         }

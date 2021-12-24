@@ -1,4 +1,7 @@
+use std::iter::FusedIterator;
+
 use arrayvec::ArrayVec;
+use enum_iterator::IntoEnumIterator;
 use enum_kinds::EnumKind;
 
 use super::*;
@@ -6,8 +9,8 @@ use super::*;
 mod port;
 pub use port::*;
 
-#[derive(Clone, Debug, EnumKind, PartialEq)]
-#[enum_kind(NodeKind)]
+#[derive(Copy, Clone, Debug, EnumKind, PartialEq)]
+#[enum_kind(NodeKind, derive(IntoEnumIterator))]
 pub enum Node {
     Abs {
         input: Port,
@@ -262,14 +265,8 @@ impl Node {
 }
 
 impl NodeKind {
-    pub fn iter() -> impl Iterator<Item = Self> {
-        IntoIterator::into_iter([
-            NodeKind::Abs,
-            NodeKind::Add,
-            NodeKind::Adsr,
-            NodeKind::Mul,
-            NodeKind::Oscillator,
-        ])
+    pub fn iter() -> impl Iterator<Item = Self> + ExactSizeIterator + FusedIterator + Copy {
+        Self::into_enum_iter()
     }
 
     pub fn name(&self) -> &'static str {
@@ -281,12 +278,4 @@ impl NodeKind {
             NodeKind::Oscillator => "Oscillator",
         }
     }
-}
-
-#[derive(Debug, Default, Clone)]
-pub struct NodeInfo {
-    pub name: &'static str,
-    pub inputs: &'static [Port],
-    pub outputs: &'static [Port],
-    pub variant: (),
 }

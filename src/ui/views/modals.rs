@@ -17,9 +17,7 @@ pub fn build(cx: &mut Context) {
                             cx.emit(AppEvent::AddNode(node));
                             cx.emit(ModalEvent::Hide);
                         },
-                        move |cx| {
-                            Label::new(cx, node.name());
-                        },
+                        move |cx| Label::new(cx, node.name()),
                     );
                 }
             });
@@ -30,9 +28,7 @@ pub fn build(cx: &mut Context) {
                 |cx| {
                     cx.emit(ModalEvent::Hide);
                 },
-                |cx| {
-                    Label::new(cx, "Close");
-                },
+                |cx| Label::new(cx, "Close"),
             );
         },
     )

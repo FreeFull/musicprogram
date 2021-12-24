@@ -1,6 +1,7 @@
 pub mod nodes;
 pub mod stack;
 
+use basedrop::Owned;
 pub use nodes::*;
 pub use stack::*;
 use wmidi::MidiMessage;
@@ -8,45 +9,33 @@ use wmidi::MidiMessage;
 use super::bitset::BitSet;
 
 pub struct Engine {
-    pub midi_in: Option<Box<dyn FnMut(&mut Engine, MidiMessage) + Send>>,
-    pub stack: stack::Stack,
+    pub channels: [Option<Owned<stack::Stack>>; 16],
     pitch: f64,
     notes: BitSet,
     notes_on: u8,
-    dropper: rtrb::Producer<Vec<Node>>,
 }
 
 impl Engine {
     pub fn new() -> Engine {
-        let (dropper_producer, mut dropper_consumer) = rtrb::RingBuffer::new(128);
-        std::thread::spawn(move || {
-            const SECOND: std::time::Duration = std::time::Duration::from_secs(1);
-            loop {
-                match dropper_consumer.pop() {
-                    Ok(_) => {}
-                    Err(rtrb::PopError::Empty) => {
-                        std::thread::sleep(SECOND);
-                    }
-                }
-            }
-        });
         Engine {
-            midi_in: None,
-            stack: stack::Stack::new(),
+            channels: [(); 16].map(|_| None),
             pitch: 110.0,
             notes: BitSet::new(),
             notes_on: 0,
-            dropper: dropper_producer,
         }
     }
 
     pub fn midi_in(&mut self, midi_message: MidiMessage) {
+        let stack = match self.channels[0].as_mut() {
+            Some(stack) => stack,
+            None => return,
+        };
         match midi_message {
             MidiMessage::NoteOn(_channel, note, _velocity) => {
                 self.pitch = note.to_freq_f64();
                 self.notes_on += 1;
                 self.notes.set(note as u8);
-                self.stack.data.control[2] = 0.0; // Reset ADSR
+                stack.data.control[2] = 0.0; // Reset ADSR
             }
             MidiMessage::NoteOff(_channel, _note, _velocity) => {
                 self.notes_on = self.notes_on.saturating_sub(1);
@@ -59,31 +48,46 @@ impl Engine {
             _ => {}
         }
         if self.notes_on > 0 {
-            self.stack.data.control[1] = 1.0;
+            stack.data.control[1] = 1.0;
         } else {
-            self.stack.data.control[1] = 0.0;
+            stack.data.control[1] = 0.0;
         }
-        self.stack.data.control[0] = self.pitch as f32;
-        /*
-        let mut midi_closure = self.midi_in.take();
-        if let Some(ref mut midi_closure) = midi_closure {
-            midi_closure(self, message);
-        }
-        self.midi_in = midi_closure;
-        */
+        stack.data.control[0] = self.pitch as f32;
     }
 
     pub fn run_command(&mut self, command: Command) {
         match command {
-            Command::ReplaceNodes(mut nodes) => {
-                std::mem::swap(&mut self.stack.nodes, &mut nodes);
-                self.dropper.push(nodes).unwrap();
+            Command::AddNode(index, _) => todo!(),
+            Command::SetChannel(index, stack) => {
+                if let Some(channel) = self.channels.get_mut(index) {
+                    *channel = Some(stack);
+                }
+            }
+            Command::ReplaceNodes(index, nodes) => {
+                if let Some(&mut Some(ref mut stack)) = self.channels.get_mut(index) {
+                    stack.nodes = nodes;
+                }
+            }
+            Command::RemoveChannel(index) => {
+                if let Some(channel) = self.channels.get_mut(index) {
+                    *channel = None;
+                }
+            }
+            Command::ResetData => {
+                for channel in &mut self.channels {
+                    if let Some(stack) = channel {
+                        stack.data = StackData::default();
+                    }
+                }
             }
         }
     }
 }
 
-#[derive(Clone, Debug)]
 pub enum Command {
-    ReplaceNodes(Vec<Node>),
+    AddNode(usize, Node),
+    SetChannel(usize, Owned<stack::Stack>),
+    ReplaceNodes(usize, stack::NodeList),
+    RemoveChannel(usize),
+    ResetData,
 }

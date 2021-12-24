@@ -12,6 +12,7 @@ pub fn start() {
     let window_desc = WindowDescription::new().with_title("musicprogram");
     let mut controller = audio::start().unwrap();
     let audio_tx = Rc::new(RefCell::new(controller.input));
+    let collector = basedrop::Collector::new();
     let app = Application::new(window_desc, move |cx| {
         cx.add_stylesheet("style.css").ok();
         model::MainModel::new(audio_tx.clone()).build(cx);

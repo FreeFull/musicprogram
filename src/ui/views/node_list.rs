@@ -18,9 +18,7 @@ pub fn build(cx: &mut Context) {
                 |cx| {
                     cx.emit(views::ModalEvent::Show("add node"));
                 },
-                |cx| {
-                    Label::new(cx, "Add");
-                },
+                |cx| Label::new(cx, "Add"),
             );
         })
         .width(Auto);

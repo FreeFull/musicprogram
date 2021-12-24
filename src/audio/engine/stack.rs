@@ -1,73 +1,27 @@
+use arrayvec::ArrayVec;
+
 use super::*;
 
-type Audio = [f32; 256];
-type Control = f32;
+pub type Audio = [f32; 256];
+pub type Control = f32;
+pub type NodeList = Owned<ArrayVec<Node, 16>>;
 
-#[derive(Clone, Debug)]
 pub struct Stack {
-    pub nodes: Vec<Node>,
+    pub nodes: NodeList,
     pub data: StackData,
 }
 
 #[derive(Clone, Debug)]
 pub struct StackData {
-    pub audio: [Audio; 256],
-    pub control: [Control; 256],
+    pub audio: Vec<Audio>,
+    pub control: Vec<Control>,
 }
 
 impl Stack {
-    pub fn new() -> Stack {
-        let mut chain = Vec::new();
-        chain.push(Node::Oscillator {
-            frequency: Port {
-                name: "frequency",
-                stack_index: Some(0),
-                kind: PortKind::Control(0.0),
-            },
-            phase: Port {
-                name: "phase",
-                stack_index: None,
-                kind: PortKind::Control(0.0),
-            },
-            waveform: Port {
-                name: "control",
-                stack_index: None,
-                kind: PortKind::Control(1.0),
-            },
-            pulse_width: Port {
-                name: "",
-                stack_index: None,
-                kind: PortKind::Control(0.125),
-            },
-            output: Port {
-                name: "output",
-                stack_index: Some(0),
-                kind: PortKind::Audio([0.0; 256]),
-            },
-        });
-        chain.push(Node::Mul {
-            input_1: Port {
-                name: "",
-                stack_index: Some(0),
-                kind: PortKind::Audio([0.0; 256]),
-            },
-            input_2: Port {
-                name: "",
-                stack_index: None,
-                kind: PortKind::Control(0.125),
-            },
-            output: Port {
-                name: "",
-                stack_index: Some(0),
-                kind: PortKind::Audio([0.0; 256]),
-            },
-        });
+    pub fn new(nodes: NodeList) -> Stack {
         Stack {
-            nodes: chain,
-            data: StackData {
-                audio: [[0.0; 256]; 256],
-                control: [0.0; 256],
-            },
+            nodes,
+            data: StackData::default(),
         }
     }
 
@@ -77,6 +31,15 @@ impl Stack {
                 node.process(chunk.len(), &mut self.data, sample_rate);
             }
             chunk.copy_from_slice(&self.data.audio[0][..chunk.len()]);
+        }
+    }
+}
+
+impl Default for StackData {
+    fn default() -> Self {
+        StackData {
+            audio: vec![[0.0; 256]; 256],
+            control: vec![0.0; 256],
         }
     }
 }

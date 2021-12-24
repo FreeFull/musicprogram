@@ -7,11 +7,11 @@ use std::{
 use vizia::*;
 use wmidi::MidiMessage;
 
-use crate::audio;
+use crate::audio::{self, Command};
 
 type AudioTx = Rc<RefCell<rtrb::Producer<audio::Command>>>;
 
-#[derive(Debug, Lens)]
+#[derive(Lens)]
 pub struct MainModel {
     pub note: Note,
     pub audio_event_tx: AudioTx,
@@ -36,6 +36,9 @@ impl Model for MainModel {
             match *app_event {
                 AddNode(kind) => {
                     self.nodes.push(audio::Node::new(kind));
+                    self.audio_event_tx
+                        .borrow_mut()
+                        .push(Command::AddNode(0, audio::Node::new(kind)));
                 }
                 RemoveNode(index) => {
                     self.nodes.remove(index);
