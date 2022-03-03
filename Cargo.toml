@@ -13,6 +13,6 @@ enum-kinds = "0.5.1"
 jack = "0.8.4"
 rtrb = "0.2.0"
 wmidi = "4.0.6"
-vizia = { git = "https://github.com/geom3trik/VIZIA" }
+vizia = { git = "https://github.com/vizia/vizia" }
 basedrop = "0.1.2"
 enum-iterator = "0.7.0"

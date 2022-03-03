@@ -57,7 +57,11 @@ impl Engine {
 
     pub fn run_command(&mut self, command: Command) {
         match command {
-            Command::AddNode(index, _) => todo!(),
+            Command::AddNode(index, node) => {
+                if let Some(Some(channel)) = self.channels.get_mut(index) {
+                    let _ = channel.nodes.try_push(node);
+                }
+            }
             Command::SetChannel(index, stack) => {
                 if let Some(channel) = self.channels.get_mut(index) {
                     *channel = Some(stack);

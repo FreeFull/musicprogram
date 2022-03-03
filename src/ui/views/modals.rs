@@ -41,16 +41,17 @@ fn modal(
     buttons: impl Fn(&mut Context) + Copy + 'static,
 ) {
     Binding::new(cx, ModalManager::visible, move |cx, field| {
+        let display = if *field.get(cx) == Some(id) {
+            Display::Flex
+        } else {
+            Display::None
+        };
         VStack::new(cx, move |cx| {
             content(cx);
             HStack::new(cx, buttons).class("buttons");
         })
         .class("modal")
-        .display(if field.get(cx) == &Some(id) {
-            Display::Flex
-        } else {
-            Display::None
-        });
+        .display(display);
     });
 }
 

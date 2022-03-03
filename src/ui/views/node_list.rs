@@ -4,10 +4,11 @@ use crate::ui::{model::*, views};
 
 pub fn build(cx: &mut Context) {
     HStack::new(cx, |cx| {
-        List::new(cx, MainModel::nodes, |cx, node| {
+        List::new(cx, MainModel::nodes, |cx, index, node| {
+            let data = node.get(cx).clone();
             HStack::new(cx, move |cx| {
-                Label::new(cx, node.value(cx).name());
-                views::Node::new(cx, node.index());
+                Label::new(cx, node.get(cx).name());
+                views::Node::new(cx, data, index);
             })
             .height(Auto);
         })
